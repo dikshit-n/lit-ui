@@ -25,13 +25,13 @@ export class MButton extends LitElement {
     size: Size = "md"
 
     @property()
-    loading: Boolean = false;
+    loading?: Boolean = false;
 
     @property()
-    disabled: Boolean = false;
+    disabled?: Boolean = false;
 
     @property()
-    class: string = "";
+    class?: string = "";
 
     override render() {
         const classNames = [this.size, this.class].filter(className => className).join(" ");
