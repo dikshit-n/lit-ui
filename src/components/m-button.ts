@@ -1,5 +1,6 @@
 import { LitElement, css, html } from "lit";
 import { customElement, property } from "lit/decorators.js"
+import { when } from 'lit/directives/when.js'
 
 @customElement("m-button")
 export class MButton extends LitElement {
@@ -22,16 +23,19 @@ export class MButton extends LitElement {
     `
 
     @property()
-    size: Size = "md"
+    size: Size = "md";
 
-    @property()
-    loading?: Boolean = false;
+    @property({ type: Boolean })
+    loading = false;
 
-    @property()
-    disabled?: Boolean = false;
+    @property({ type: Boolean })
+    disabled = false;
 
-    @property()
-    class?: string = "";
+    @property({ type: String })
+    class = "";
+
+    @property({ attribute: 'role' })
+    ariaRole: string | null = 'button';
 
     override render() {
         const classNames = [this.size, this.class].filter(className => className).join(" ");
@@ -40,7 +44,8 @@ export class MButton extends LitElement {
                 class=${classNames}
                 ?disabled=${this.loading ? true : this.disabled}
             >
-                ${this.loading ? '...' : html`<slot></slot>`}
+                ${when(this.loading, () => '...')}
+                ${when(!this.loading, () => html`<slot></slot>`)}
             </button>
         `
     };
