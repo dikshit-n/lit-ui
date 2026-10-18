@@ -20,7 +20,7 @@ export class MClock extends LitElement {
         }
     `;
 
-    private timerInterval: number | undefined = undefined;
+    private timerInterval: ReturnType<typeof setTimeout> | undefined = undefined;
 
     @state()
     private time = this.convertTime(new Date());

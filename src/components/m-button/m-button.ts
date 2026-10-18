@@ -57,4 +57,4 @@ declare global {
     }
 };
 
-type Size = "sm" | "md" | "lg"
+type Size = "sm" | "md" | "lg";
