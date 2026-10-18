@@ -1,0 +1,156 @@
+// =============================================================================
+// m-button styles
+// =============================================================================
+// Two-file pattern: this file owns all presentation for the component.
+// Logic (.ts) only knows about state — variants, sizes, disabled, loading,
+// type. Every visual decision is here, driven by `:host([...])` selectors.
+//
+// Theming model (per docs/README.md):
+//   1. Public custom properties use the `--m-*` namespace.
+//      `--m-color-primary`, `--m-color-secondary-bg`, `--m-color-danger`, etc.
+//   2. Each public property has a SCSS-token fallback from `tokens.scss`,
+//      inlined at build time.
+//   3. Internal aliases (`--_bg`, `--_bg-hover`, `--_fg`, …) are the single
+//      point of reference for the actual rules below. Variants and sizes
+//      only override aliases, never raw colors.
+// =============================================================================
+
+@use '../../styles/tokens' as t;
+@use '../../styles/mixins' as m;
+
+// -----------------------------------------------------------------------------
+// Host — internal alias defaults
+// -----------------------------------------------------------------------------
+:host {
+    // Color
+    --_bg:       var(--m-color-primary,        #{t.$m-color-primary});
+    --_bg-hover: var(--m-color-primary-hover,  #{t.$m-color-primary-hover});
+    --_fg:       var(--m-color-primary-fg,     #{t.$m-color-primary-fg});
+
+    // Geometry — overridable per-size on the host.
+    --_padding:   var(--m-space-md,     #{t.$m-space-md});
+    --_radius:    var(--m-radius-md,    #{t.$m-radius-md});
+    --_font-size: var(--m-font-size-md, #{t.$m-font-size-md});
+
+    // Motion
+    --_duration: #{t.$m-motion-fast};
+    --_ease:     #{t.$m-motion-ease};
+
+    display: inline-flex;
+    vertical-align: middle;
+    font-family: #{t.$m-font-family};
+}
+
+// -----------------------------------------------------------------------------
+// Variants — attributes on the host, never classes on the inner element.
+// -----------------------------------------------------------------------------
+:host([variant='secondary']) {
+    --_bg:       var(--m-color-secondary-bg,    #{t.$m-color-secondary-bg});
+    --_bg-hover: var(--m-color-secondary-hover, #{t.$m-color-secondary-hover});
+    --_fg:       var(--m-color-secondary-fg,    #{t.$m-color-secondary-fg});
+}
+
+:host([variant='danger']) {
+    --_bg:       var(--m-color-danger,        #{t.$m-color-danger});
+    --_bg-hover: var(--m-color-danger-hover,  #{t.$m-color-danger-hover});
+    --_fg:       var(--m-color-danger-fg,     #{t.$m-color-danger-fg});
+}
+
+// -----------------------------------------------------------------------------
+// Sizes
+// -----------------------------------------------------------------------------
+:host([size='sm']) {
+    --_padding:   var(--m-space-sm,     #{t.$m-space-sm});
+    --_font-size: var(--m-font-size-sm, #{t.$m-font-size-sm});
+    --_radius:    var(--m-radius-sm,    #{t.$m-radius-sm});
+}
+
+:host([size='lg']) {
+    --_padding:   var(--m-space-lg,     #{t.$m-space-lg});
+    --_font-size: var(--m-font-size-lg, #{t.$m-font-size-lg});
+    --_radius:    var(--m-radius-lg,    #{t.$m-radius-lg});
+}
+
+// -----------------------------------------------------------------------------
+// Disabled state — host attribute so the visual applies even if the inner
+// <button> is re-rendered before the host attribute reflects.
+// -----------------------------------------------------------------------------
+:host([disabled]) {
+    cursor: not-allowed;
+    opacity: 0.5;
+    // Belt-and-braces: native `disabled` on the inner button already blocks
+    // pointer events, but this guarantees the host itself never gets a click.
+    pointer-events: none;
+}
+
+:host([loading]) {
+    cursor: progress;
+}
+
+// -----------------------------------------------------------------------------
+// Inner button — real semantic element. Picked up by screen readers and
+// native form-submission behavior.
+// -----------------------------------------------------------------------------
+button {
+    @include m.reset-button;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--m-space-icon-gap, #{t.$m-space-icon-gap});
+
+    padding: var(--_padding);
+    background: var(--_bg);
+    color: var(--_fg);
+    border-radius: var(--_radius);
+
+    font-weight: #{t.$m-font-weight};
+    font-size: var(--_font-size);
+    line-height: #{t.$m-line-height};
+    font-family: #{t.$m-font-family};
+
+    @include m.motion(
+        background-color var(--_duration) var(--_ease),
+        transform       var(--_duration) var(--_ease)
+    );
+}
+
+button:hover:not(:disabled) {
+    background: var(--_bg-hover);
+}
+
+button:active:not(:disabled) {
+    transform: translateY(1px);
+}
+
+// Focus ring — keyboard only.
+button:focus-visible {
+    @include m.focus-ring;
+}
+
+// -----------------------------------------------------------------------------
+// Loading spinner — a real <span> child rendered by the .ts file when
+// `loading` is true. Keeps the slot content visible so the user still sees
+// what action is in progress.
+// -----------------------------------------------------------------------------
+.spinner {
+    width: 12px;
+    height: 12px;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: m-button-spin #{t.$m-motion-spinner} linear infinite;
+
+    // Reduced-motion users still see rotation, just slow enough not to be
+    // disorienting. We don't kill the indicator entirely — the button is
+    // mid-action and the user needs to know.
+    @media (prefers-reduced-motion: reduce) {
+        animation-duration: 3s;
+    }
+}
+
+@keyframes m-button-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}

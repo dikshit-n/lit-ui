@@ -1,0 +1,56 @@
+// =============================================================================
+// Reusable SASS mixins
+// =============================================================================
+// Imported per-component via `@use '../../styles/mixins' as m;`. Every mixin
+// resolves at build time — no runtime cost.
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// `reset-button` — strip the user-agent <button> defaults so the component
+// owns its visual presentation. Use on every internal interactive element.
+// -----------------------------------------------------------------------------
+@mixin reset-button {
+    appearance: none;
+    -webkit-appearance: none;
+
+    background: none;
+    border: 0;
+    margin: 0;
+    padding: 0;
+
+    font: inherit;
+    color: inherit;
+    letter-spacing: inherit;
+    text-align: inherit;
+
+    cursor: pointer;
+
+    // Suppress the IE/old-Edge text-in-button overflow artifact.
+    overflow: visible;
+}
+
+// -----------------------------------------------------------------------------
+// `focus-ring` — apply a consistent 2px outline that respects the design
+// system's `--m-color-focus` token. Pair with `:focus-visible` so the ring
+// only appears for keyboard users, not on every mouse click.
+// -----------------------------------------------------------------------------
+@mixin focus-ring($offset: 2px) {
+    outline: 2px solid var(--m-color-focus, currentColor);
+    outline-offset: $offset;
+}
+
+// -----------------------------------------------------------------------------
+// `motion` — wrap transition declarations in
+// `@media (prefers-reduced-motion: no-preference)` so the property changes
+// are static for users who request reduced motion. Per the README
+// convention, this is the inverse of `prefers-reduced-motion: reduce` and is
+// the project's standard pattern.
+//
+// Usage:
+//   @include m.motion(background-color 180ms ease, transform 180ms ease);
+// -----------------------------------------------------------------------------
+@mixin motion($properties...) {
+    @media (prefers-reduced-motion: no-preference) {
+        transition: $properties;
+    }
+}

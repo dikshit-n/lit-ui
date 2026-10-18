@@ -1,0 +1,72 @@
+// =============================================================================
+// Design tokens
+// =============================================================================
+// SASS-side variable names follow the `m-*` namespace so component SCSS can
+// `@use 'tokens' as t` and reference them as `t. $m-color-primary`.
+//
+// These values are inlined at build time into each component's compiled CSS
+// as fallbacks for the public `--m-*` custom properties exposed on the host.
+// Consumers override the *custom properties* on a parent element to retheme;
+// the SCSS variables here are the defaults only.
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// Color
+// -----------------------------------------------------------------------------
+
+// Primary — interactive accent (CTAs, links, focus rings).
+$m-color-primary:         #2563eb;
+$m-color-primary-hover:   #1d4ed8;
+$m-color-primary-fg:      #ffffff;
+
+// Secondary — neutral surface for low-emphasis actions.
+$m-color-secondary-bg:    #f3f4f6;
+$m-color-secondary-hover: #e5e7eb;
+$m-color-secondary-fg:    #111827;
+
+// Danger — destructive actions.
+$m-color-danger:          #dc2626;
+$m-color-danger-hover:    #b91c1c;
+$m-color-danger-fg:       #ffffff;
+
+// Focus ring color (overridable via `--m-color-focus`).
+$m-color-focus:           #2563eb;
+
+// -----------------------------------------------------------------------------
+// Spacing — button padding per size step
+// -----------------------------------------------------------------------------
+$m-space-sm: 6px 12px;
+$m-space-md: 8px 16px;
+$m-space-lg: 12px 24px;
+
+// Gap between icon slot and label slot.
+$m-space-icon-gap: 8px;
+
+// -----------------------------------------------------------------------------
+// Radius
+// -----------------------------------------------------------------------------
+$m-radius-sm: 4px;
+$m-radius-md: 6px;
+$m-radius-lg: 8px;
+
+// -----------------------------------------------------------------------------
+// Typography
+// -----------------------------------------------------------------------------
+$m-font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+$m-font-weight: 500;
+$m-font-size-sm: 13px;
+$m-font-size-md: 14px;
+$m-font-size-lg: 16px;
+$m-line-height: 1.2;
+
+// -----------------------------------------------------------------------------
+// Motion — duration + easing
+// -----------------------------------------------------------------------------
+// Short, snappy transitions for state changes. Apply via the `motion` mixin
+// in `_mixins.scss`, which wraps in `prefers-reduced-motion: no-preference`.
+$m-motion-fast: 120ms;
+$m-motion-base: 180ms;
+$m-motion-ease: cubic-bezier(0.2, 0, 0, 1);
+
+// Spinner rotation (longer than state transitions so it reads as continuous).
+$m-motion-spinner: 0.8s;
