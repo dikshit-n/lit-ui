@@ -1,7 +1,8 @@
 // =============================================================================
 // <m-button>
 // =============================================================================
-// Production template per docs/README.md — every component convention in one
+// Production template per docs/COMPONENT_STANDARDS.md and the
+// docs/DEFINITION_OF_DONE.md checklist — every component convention in one
 // place: variants on the host, form-association via ElementInternals, a
 // typed `m-button-click` event with `composed: true, bubbles: true`, a11y
 // (`aria-busy`, `:focus-visible`, real <button> under the hood), slots for

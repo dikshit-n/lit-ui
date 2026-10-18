@@ -1,7 +1,8 @@
 // =============================================================================
 // m-button unit tests
 // =============================================================================
-// Vitest + happy-dom (see docs/README.md). Covers the public contract:
+// Vitest + happy-dom (see docs/COMPONENT_STANDARDS.md §9). Covers the
+// public contract:
 //   - Custom-element registration
 //   - Default + reflected props
 //   - Slots (default + named `icon`)

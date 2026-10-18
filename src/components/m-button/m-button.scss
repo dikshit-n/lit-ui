@@ -5,7 +5,7 @@
 // Logic (.ts) only knows about state — variants, sizes, disabled, loading,
 // type. Every visual decision is here, driven by `:host([...])` selectors.
 //
-// Theming model (per docs/README.md):
+// Theming model (per docs/COMPONENT_STANDARDS.md §5):
 //   1. Public custom properties use the `--m-*` namespace.
 //      `--m-color-primary`, `--m-color-secondary-bg`, `--m-color-danger`, etc.
 //   2. Each public property has a SCSS-token fallback from `tokens.scss`,

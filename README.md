@@ -4,10 +4,24 @@ Framework-agnostic UI primitives built with [Lit](https://lit.dev) and native We
 
 ---
 
+## Documentation
+
+Two companion documents in `docs/`:
+
+- **[Component standards](./docs/COMPONENT_STANDARDS.md)** — engineering fundamentals: reactive state, form-association internals, theming, a11y, events, performance, testing, Storybook.
+- **[Definition of done](./docs/DEFINITION_OF_DONE.md)** — the checklist that gates "this component is ready to ship."
+
+The rest of this README is project-level orientation: structure, scripts, setup, architectural overview, scope.
+
+---
+
 ## Project structure
 
 ```
 lit-ui/
+├── docs/
+│   ├── COMPONENT_STANDARDS.md    # Engineering fundamentals
+│   └── DEFINITION_OF_DONE.md     # Component-completion checklist
 ├── src/
 │   ├── components/
 │   │   ├── m-counter/              # Reference: Lit primitives, a11y, events
@@ -30,9 +44,9 @@ lit-ui/
 └── package.json
 ```
 
-**Two-file pattern per component.** Logic lives in the `.ts` file. Styles live in a sibling `.scss` file. This keeps reviews focused and the component folder portable — drop the whole folder into another project and it just works.
-
-**Tokens and mixins are global.** Components `@use` them by path; the SASS compiler inlines the values at build time. No runtime CSS-in-JS.
+**Component folder is portable.** Each `m-<name>/` folder is self-contained: logic, styles, tests, and stories live together. Tokens and mixins are global; components `@use` them by path. See
+[§1 File structure](./docs/COMPONENT_STANDARDS.md#1-file-structure) and
+[§5 Theming](./docs/COMPONENT_STANDARDS.md#5-theming-public-internal-scss-fallback) for the conventions.
 
 ---
 
@@ -44,41 +58,9 @@ Every component is a single class extending `LitElement` registered with `@custo
 
 | Layer | Mechanism | Purpose |
 |---|---|---|
-| **Inputs** | `@property` decorated fields | Reactive public API; reflected to HTML attributes for non-boolean primitives |
-| **Outputs** | `CustomEvent` with `composed: true, bubbles: true` | Cross Shadow DOM boundaries; consumable from any framework |
+| **Inputs** | `@property` decorated fields | Reactive public API; reflected to HTML attributes where the standard requires (see [§4 Variants](./docs/COMPONENT_STANDARDS.md#4-variants-on-the-host-not-inner-classes)) |
+| **Outputs** | `CustomEvent` with `composed: true, bubbles: true` | Cross Shadow DOM boundaries; consumable from any framework (see [§7 Events](./docs/COMPONENT_STANDARDS.md#7-events)) |
 | **Composition** | Named + default slots | Light-DOM children projected into the Shadow DOM |
-
-### Encapsulation
-
-Shadow DOM is the default. Component styles cannot leak out, and global styles cannot leak in — except via **CSS custom properties**. This is the entire theming story: consumers set `--m-color-primary` on a parent, components pick it up with a fallback.
-
-```scss
-:host {
-  --_bg: var(--m-color-primary, #0066ff);   /* internal alias + fallback */
-  background: var(--_bg);
-}
-```
-
-Double-dash prefix (`--_bg`) is the convention for **internal** aliases derived from public design tokens. Consumers only ever touch the `m-` namespace.
-
-### Variant strategy
-
-Variants are **attributes on the host**, not classes on the inner element. This lets consumers target them with CSS selectors and keeps the internal class list minimal:
-
-```scss
-:host([variant='secondary']) { --_bg: #{t.$m-color-secondary-bg}; }
-:host([variant='danger'])    { --_bg: #{t.$m-color-danger}; }
-```
-
-The shared `button` rule below uses the alias, so every variant gets hover/active/focus behavior automatically.
-
-### Form-association
-
-Components that participate in forms set `static formAssociated = true` and call `this.attachInternals()` in the constructor. This gives them:
-
-- Participation in `<form>` submission (like a native `<button>` or `<input>`).
-- The `ElementInternals` API for `formDisabledCallback`, `setFormValue`, validation hooks, etc.
-- React/Angular/Vue form libraries can read their values through the standard `FormData` interface.
 
 ### Cross-framework consumption
 
@@ -87,16 +69,6 @@ Components that participate in forms set `static formAssociated = true` and call
 - **Vue 3.4+**: works without config. v-model on form-associated elements is built-in.
 
 The `composed: true` flag on every dispatched event is what makes this work — it lets the event cross the Shadow DOM boundary so framework event systems can hear it.
-
-### Testing
-
-- **Unit** — Vitest + happy-dom. Each component gets a co-located `.test.ts` covering props, events, slots, ARIA, and edge cases.
-- **Accessibility** — `@storybook/addon-a11y` (axe-core) runs against every story. Use it as the a11y test surface.
-- **Visual regression** — pair with Chromatic or Percy when ready.
-
-### Documentation
-
-Each component gets a co-located `.stories.ts` with controls wired to all props and a `tags: ['autodocs']` flag — Storybook generates the props table and usage examples automatically. MDX pages go alongside when a component needs a longer narrative.
 
 ---
 
@@ -109,7 +81,7 @@ Each component gets a co-located `.stories.ts` with controls wired to all props 
 | `npm run test` | Run the full Vitest suite once. |
 | `npm run test:watch` | Re-run tests on file change. Use during development. |
 | `npm run storybook` | Storybook at `http://localhost:6006`. Component explorer + a11y checks. |
-| `npm run build-storybook` | Static Storybook build for deploy (Chromatic, Netlify, etc.). |
+| `npm run build:storybook` | Static Storybook build for deploy (Chromatic, Netlify, etc.). |
 
 Add `npm run lint` and `npm run format` when you wire ESLint + Prettier — the rest of the tooling is intentionally minimal until you have a team convention to follow.
 
@@ -164,19 +136,9 @@ The bundle is tree-shakeable — consumers only ship the components they import.
 
 ## Adding a new component
 
-1. Create a folder under `src/components/m-<name>/`.
-2. Add four files: `m-<name>.ts`, `m-<name>.scss`, `m-<name>.test.ts`, `m-<name>.stories.ts`.
-3. Use `m-button` as the template — it has every convention you need (SASS, theming, form-association, a11y, events, slots, tests, story).
-4. Re-export from `src/index.ts`.
+The fastest path: open **[DEFINITION_OF_DONE.md](./docs/DEFINITION_OF_DONE.md)** and run the checklist. Every box needs to be checked before merging. For the "why" behind each item, see **[COMPONENT_STANDARDS.md](./docs/COMPONENT_STANDARDS.md)**.
 
-Conventions to follow without exception:
-
-- **Tag prefix:** `m-` (design system namespace).
-- **Event prefix:** `m-<component>-<event>` — e.g. `m-change`, `m-button-click`. Always `composed: true, bubbles: true`.
-- **Boolean props:** `@property({ type: Boolean })`. Reflect to attribute only if consumers need CSS targeting.
-- **Slots:** default for the primary content, named slots for structural pieces (e.g. `icon`).
-- **A11y:** every interactive component gets `:focus-visible`, `aria-busy` for loading states, and a real semantic element under the hood (button, input, etc.).
-- **Motion:** wrap transitions in `@media (prefers-reduced-motion: no-preference)` or always provide a reduced-motion override.
+Use `m-button` as the working template — it implements every convention in the checklist and the standards doc.
 
 ---
 
