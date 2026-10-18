@@ -6,10 +6,11 @@ Framework-agnostic UI primitives built with [Lit](https://lit.dev) and native We
 
 ## Documentation
 
-Two companion documents in `docs/`:
+Three documents in `docs/`:
 
 - **[Component standards](./docs/COMPONENT_STANDARDS.md)** — engineering fundamentals: reactive state, form-association internals, theming, a11y, events, performance, testing, Storybook.
 - **[Definition of done](./docs/DEFINITION_OF_DONE.md)** — the checklist that gates "this component is ready to ship."
+- **[Internal architecture](./docs/INTERNAL_ARCHITECTURE.md)** — design-system internals for maintainers (styling flow, etc.).
 
 The rest of this README is project-level orientation: structure, scripts, setup, architectural overview, scope.
 
